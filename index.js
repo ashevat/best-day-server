@@ -66,7 +66,7 @@ express()
     //  return res.status(500).send(err);
     //res.send(`File uploaded! `);
     //});
-    const image_name = image.name + uuidv4();
+    const image_name = uuidv4() + image.name ;
     //res.set({ 'Content-Type': 'image/png' });
     //const val = image.data.toString('hex')
     //const b = Buffer.from(val, "hex")
