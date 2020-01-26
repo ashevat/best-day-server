@@ -1,11 +1,13 @@
 const express = require('express')
 const path = require('path')
 const PORT = process.env.PORT || 5000
+const fileUpload = require('express-fileupload');
+
 
 const { Pool } = require('pg');
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: true
+  ssl: false
 });
 
 express()
@@ -19,8 +21,8 @@ express()
     try {
       const client = await pool.connect()
       const result = await client.query('SELECT * FROM test_table');
-      const results = { 'results': (result) ? result.rows : null};
-      res.render('pages/db', results );
+      const results = { 'results': (result) ? result.rows : null };
+      res.render('pages/db', results);
       client.release();
     } catch (err) {
       console.error(err);
@@ -28,5 +30,102 @@ express()
     }
   })
 
-  
-  .listen(PORT, () => console.log(`Listening on ${ PORT }`))
+
+
+  .get('/serve/:id', async (req, res) => {
+
+    const client = await pool.connect();
+    const result = await client.query(`SELECT * FROM images WHERE imgname='${req.params.id}'`); //
+
+    //var links = await get(LINKS);
+    //var index = Math.floor(Math.random() * links.length);
+    //var url = links[index];
+    res.set({ 'Content-Type': 'image/png' });
+    //res.buffer();
+    const buf = new Buffer.from(result.rows[0].img, "hex")
+
+    //const body = result.rows[0].img;
+    client.release();
+    res.end(buf)
+    //fetch(url)
+    //    .then(res => res.buffer())
+    //    .then(body => res.end(body));
+
+  })
+
+
+  .post('/upload', fileUpload(), express.json(), async (req, res) => {
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).send('No files were uploaded.');
+    }
+    const client = await pool.connect();
+    let image = req.files.image;
+
+    //image.mv('./qwerty.jpg', function (err) {
+    //if (err)
+    //  return res.status(500).send(err);
+    //res.send(`File uploaded! `);
+    //});
+    const image_name = image.name + uuidv4();
+    //res.set({ 'Content-Type': 'image/png' });
+    //const val = image.data.toString('hex')
+    //const b = Buffer.from(val, "hex")
+    //console.log(b);
+    //res.end(b);//  (image.data)
+    const result = await client.query(
+      `INSERT INTO images(imgname, img )VALUES('${image_name}', '${image.data.toString('hex')}')`,
+      (err, res) => {
+        console.log(err, res);
+      }
+    );
+
+
+   const result1 = await client.query(
+     `INSERT INTO bde_inital(id, sentence, image_path)VALUES(DEFAULT, '${req.body.sentence}', '/serve/${image_name}')`,
+      (err, res) => {
+        console.log(err, res);
+      }
+    );
+
+    client.release();
+
+    res.redirect('/bde');
+
+  })
+
+  .get('/bde', async (req, res) => {
+    try {
+      const client = await pool.connect()
+      const result = await client.query('SELECT * FROM bde_inital');
+      const results = { 'results': (result) ? result.rows : null };
+      res.render('pages/bde', results);
+      client.release();
+    } catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+  })
+
+
+  .get('/delete/:id', async (req, res) => {
+    try {
+      const client = await pool.connect()
+      const result = await client.query(`DELETE FROM bde_inital where id='${req.params.id}'`);
+      client.release();
+      res.redirect('/bde');
+    } catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+  })
+
+
+  .listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}

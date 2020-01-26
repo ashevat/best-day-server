@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../partials/header.ejs %>
+</head>
+
+<body>
+
+<% include ../partials/nav.ejs %>
+
+<div class="container">
+<h2>Initial app data</h2>
+
+<ul>
+    <% results.forEach(function(r) { %>
+        <li><%= r.id %> | <%= r.sentence %> | <img src="<%= r.image_path %>" width="50">  </li>
+    <% }); %>
+</ul>
+
+<h2>Add sentence and image:</h2>
+<form ref='uploadForm' 
+			id='uploadForm' 
+			action='/upload' 
+			method='post' 
+      encType="multipart/form-data">
+      <label>Sentence:</label><input type="text" name="sentence" /><br>
+      <label>image:</label> <input type="file" name="image" />
+        
+				<input type='submit' value='Upload!' />
+</form>	
+    
+
+
+</div>
+
+
+
+ <!--Data:
+bde_initial
+id serial
+sentense text
+image_path
+
+
+bde
+id serial
+sentense text
+vertical_image_path
+horizontal_image_path
+ -->
+</body>
+</html>
+
+
+
