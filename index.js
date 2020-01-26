@@ -107,6 +107,21 @@ express()
   })
 
 
+  .get('/api/bde_init', async (req, res) => {
+    try {
+      const client = await pool.connect()
+      const result = await client.query('SELECT * FROM bde_inital');
+      const results = { 'results': (result) ? result.rows : null };
+      console.log(JSON.stringify(results));
+      //res.render('pages/bde', results);
+      client.release();
+      res.end(JSON.stringify(results))
+    } catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+  })
+
   .get('/delete/:id', async (req, res) => {
     try {
       const client = await pool.connect()
