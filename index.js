@@ -78,8 +78,6 @@ express()
         console.log(err, res);
       }
     );
-
-
    const result1 = await client.query(
      `INSERT INTO bde_inital(id, sentence, image_path)VALUES(DEFAULT, '${req.body.sentence}', '/serve/${image_name}')`,
       (err, res) => {
@@ -90,6 +88,57 @@ express()
     client.release();
 
     res.redirect('/bde');
+
+  })
+
+
+
+  .post('/upload-notifications', fileUpload(), express.json(), async (req, res) => {
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).send('No files were uploaded.');
+    }
+    const client = await pool.connect();
+    let v_image = req.files.v_image;
+    let h_image = req.files.h_image;
+    let date = req.body.date;
+
+    //image.mv('./qwerty.jpg', function (err) {
+    //if (err)
+    //  return res.status(500).send(err);
+    //res.send(`File uploaded! `);
+    //});
+    const vertical_image_name = uuidv4() + v_image.name ;
+    const horizontal_image_name = uuidv4() + h_image.name ;
+    //res.set({ 'Content-Type': 'image/png' });
+    //const val = image.data.toString('hex')
+    //const b = Buffer.from(val, "hex")
+    //console.log(b);
+    //res.end(b);//  (image.data)
+    const result = await client.query(
+      `INSERT INTO images(imgname, img )VALUES('${vertical_image_name}', '${v_image.data.toString('hex')}')`,
+      (err, res) => {
+        console.log(err, res);
+      }
+    );
+    const result1 = await client.query(
+      `INSERT INTO images(imgname, img )VALUES('${horizontal_image_name}', '${h_image.data.toString('hex')}')`,
+      (err, res) => {
+        console.log(err, res);
+      }
+    );
+
+    console.log("running SQL- "+ `INSERT INTO bde(id, sentence, image_vertical_path, image_horizontal_path, due)VALUES(DEFAULT, '${req.body.sentence}', '/serve/${vertical_image_name}',  '/serve/${horizontal_image_name}', '${date}')`);
+
+   const result2 = await client.query(
+     `INSERT INTO bde(id, sentence, image_vertical_path, image_horizontal_path, due)VALUES(DEFAULT, '${req.body.sentence}', '/serve/${vertical_image_name}',  '/serve/${horizontal_image_name}', '${date}')`,
+      (err, res) => {
+        console.log(err, res);
+      }
+    );
+
+    client.release();
+
+    res.redirect('/bde-notifications');
 
   })
 
@@ -106,6 +155,22 @@ express()
     }
   })
 
+  .get('/bde-notifications', async (req, res) => {
+    try {
+      const client = await pool.connect()
+      const result = await client.query('SELECT * FROM bde');
+      const results = { 'results': (result) ? result.rows : null };
+
+      console.log(results);
+
+      res.render('pages/bde-notifications', results);
+      client.release();
+    } catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+  })
+
 
   .get('/api/bde_init', async (req, res) => {
     try {
@@ -113,6 +178,39 @@ express()
       const result = await client.query('SELECT * FROM bde_inital');
       const results = { 'results': (result) ? result.rows : null };
       console.log(JSON.stringify(results));
+      //res.render('pages/bde', results);
+      client.release();
+      res.end(JSON.stringify(results))
+    } catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+  })
+
+  .get('/api/bde_all_notif', async (req, res) => {
+    try {
+      const client = await pool.connect()
+      const result = await client.query('SELECT * FROM bde');
+      const results = { 'results': (result) ? result.rows : null };
+      console.log(JSON.stringify(results));
+      //res.render('pages/bde', results);
+      client.release();
+      res.end(JSON.stringify(results))
+    } catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+  })
+
+  .get('/api/bde_today_notif', async (req, res) => {
+    try {
+      const client = await pool.connect()
+      var moment = require('moment');
+      let today = moment().format("YYYY-MM-DD");
+      console.log(today);
+      const result = await client.query(`SELECT * FROM bde WHERE due='${today}'`);
+      const results = { 'results': (result) ? result.rows : null };
+      //console.log(JSON.stringify(results));
       //res.render('pages/bde', results);
       client.release();
       res.end(JSON.stringify(results))
