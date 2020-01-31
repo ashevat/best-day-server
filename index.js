@@ -232,6 +232,18 @@ express()
     }
   })
 
+  .get('/delete_notif/:id', async (req, res) => {
+    try {
+      const client = await pool.connect()
+      const result = await client.query(`DELETE FROM bde where id='${req.params.id}'`);
+      client.release();
+      res.redirect('/bde-notifications');
+    } catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+  })
+
 
   .listen(PORT, () => console.log(`Listening on ${PORT}`));
 
