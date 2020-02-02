@@ -13,7 +13,7 @@
 
 <ul>
     <% results.forEach(function(r) { %>
-        <li><%= r.id %> | <%= r.sentence %>| <%= r.font_color %> | <img src="<%= r.image_path %>" width="50">   </li>
+        <li><%= r.id %> | <%= r.sentence %>| <%= r.font_color %> | <img src="<%= r.image_path %>" width="50"> [<a href="./bde/edit/<%= r.id %>">edit</a>]  </li>
     <% }); %>
 </ul>
 

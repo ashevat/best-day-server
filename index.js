@@ -61,17 +61,7 @@ express()
     const client = await pool.connect();
     let image = req.files.image;
 
-    //image.mv('./qwerty.jpg', function (err) {
-    //if (err)
-    //  return res.status(500).send(err);
-    //res.send(`File uploaded! `);
-    //});
     const image_name = uuidv4() + image.name ;
-    //res.set({ 'Content-Type': 'image/png' });
-    //const val = image.data.toString('hex')
-    //const b = Buffer.from(val, "hex")
-    //console.log(b);
-    //res.end(b);//  (image.data)
     const result = await client.query(
       `INSERT INTO images(imgname, img )VALUES('${image_name}', '${image.data.toString('hex')}')`,
       (err, res) => {
@@ -84,6 +74,49 @@ express()
         console.log(err, res);
       }
     );
+
+    client.release();
+
+    res.redirect('/bde');
+
+  })
+
+
+  .post('/upload/edit/:id', fileUpload(), express.json(), async (req, res) => {
+    
+    let image =null;
+    if (!req.files || Object.keys(req.files).length === 0) {
+      //return res.status(400).send('No files were uploaded.');
+      image =false;
+    }else{
+      image = req.files.image;
+    }
+    const client = await pool.connect();
+    if(image){
+      const image_name = uuidv4() + image.name ;
+      const result = await client.query(
+        `INSERT INTO images(imgname, img )VALUES('${image_name}', '${image.data.toString('hex')}')`,
+        (err, res) => {
+          console.log(err, res);
+        }
+      );
+
+      const result1 = await client.query(
+        `UPDATE bde_inital SET ( sentence, font_color, image_path) = ('${req.body.sentence}' ,'${req.body.font_color}', '/serve/${image_name}') WHERE id ='${req.params.id}'`,
+         (err, res) => {
+           console.log(err, res);
+         }
+       );
+    }else{
+      const result1 = await client.query(
+        `UPDATE bde_inital SET ( sentence, font_color) = ('${req.body.sentence}' ,'${req.body.font_color}') WHERE id ='${req.params.id}'`,
+         (err, res) => {
+           console.log(err, res);
+         }
+       );
+    }
+    
+   
 
     client.release();
 
@@ -154,6 +187,21 @@ express()
       res.send("Error " + err);
     }
   })
+
+  .get('/bde/edit/:id', async (req, res) => {
+    try {
+      const client = await pool.connect()
+      const result = await client.query(`SELECT * FROM bde_inital WHERE id='${req.params.id}'`);
+      const results = { 'results': (result) ? result.rows : null };
+      res.render('pages/bde-edit', results);
+      client.release();
+    } catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+  })
+
+
 
   .get('/bde-notifications', async (req, res) => {
     try {

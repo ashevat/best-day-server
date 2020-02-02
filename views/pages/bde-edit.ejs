@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../partials/header.ejs %>
+</head>
+
+<body>
+
+<% include ../partials/nav.ejs %>
+
+<div class="container">
+<h2>Edit sentence and image:</h2>
+<form ref='uploadForm' 
+			id='uploadForm' 
+			action='/upload/edit/<%= results[0].id %>' 
+			method='post' 
+      encType="multipart/form-data">
+      <label>Sentence:</label><input type="text" name="sentence" value="<%= results[0].sentence %>" /><br>
+      <label>image:</label> <input type="file" name="image" /> orig <img width="25px" src="<%= results[0].image_path %>"><br>
+      <label>font color:</label> <input type="text" name="font_color" value="<%= results[0].font_color %>" /><br>
+        
+				<input type='submit' value='Upload!' />
+</form>	
+    
+
+
+</div>
+
+
+
+ <!--Data:
+bde_initial
+id serial
+sentense text
+image_path
+
+
+bde
+id serial
+sentense text
+vertical_image_path
+horizontal_image_path
+ -->
+</body>
+</html>
+
+
+
