@@ -79,7 +79,7 @@ express()
       }
     );
    const result1 = await client.query(
-     `INSERT INTO bde_inital(id, sentence, image_path)VALUES(DEFAULT, '${req.body.sentence}', '/serve/${image_name}')`,
+     `INSERT INTO bde_inital(id, sentence, font_color, image_path)VALUES(DEFAULT, '${req.body.sentence}' ,'${req.body.font_color}', '/serve/${image_name}')`,
       (err, res) => {
         console.log(err, res);
       }
@@ -127,10 +127,10 @@ express()
       }
     );
 
-    console.log("running SQL- "+ `INSERT INTO bde(id, sentence, image_vertical_path, image_horizontal_path, due)VALUES(DEFAULT, '${req.body.sentence}', '/serve/${vertical_image_name}',  '/serve/${horizontal_image_name}', '${date}')`);
+    //console.log("running SQL- "+ `INSERT INTO bde(id, sentence, font_color, image_vertical_path, image_horizontal_path, due)VALUES(DEFAULT, '${req.body.sentence}',${req.body.font_color}, '/serve/${vertical_image_name}',  '/serve/${horizontal_image_name}', '${date}')`);
 
    const result2 = await client.query(
-     `INSERT INTO bde(id, sentence, image_vertical_path, image_horizontal_path, due)VALUES(DEFAULT, '${req.body.sentence}', '/serve/${vertical_image_name}',  '/serve/${horizontal_image_name}', '${date}')`,
+     `INSERT INTO bde(id, sentence, font_color, image_vertical_path, image_horizontal_path, due)VALUES(DEFAULT, '${req.body.sentence}','${req.body.font_color}', '/serve/${vertical_image_name}',  '/serve/${horizontal_image_name}', '${date}')`,
       (err, res) => {
         console.log(err, res);
       }

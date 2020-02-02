@@ -13,7 +13,7 @@
 
 <ul>
     <% results.forEach(function(r) { %>
-        <li><%= r.due %> | <%= r.id %> | <%= r.sentence %> | <img src="<%= r.image_vertical_path %>" width="50"> | <img src="<%= r.image_horizontal_path %>" width="50">  </li>
+        <li><%= r.due %> | <%= r.id %> | <%= r.sentence %> | <%= r.font_color %> | <img src="<%= r.image_vertical_path %>" width="50"> | <img src="<%= r.image_horizontal_path %>" width="50">  </li>
     <% }); %>
 </ul>
 
@@ -26,7 +26,8 @@
       <label>Sentence:</label><input type="text" name="sentence" /><br>
       <label>Vertical image:</label> <input type="file" name="v_image" /><br>
       <label>horizontal image:</label> <input type="file" name="h_image" /><br>
-      <input type="date" name="date">
+      <label>font color:</label> <input type="text" name="font_color" /><br>
+      <input type="date" name="date"><br>
 				<input type='submit' value='Upload!' />
 </form>	
     

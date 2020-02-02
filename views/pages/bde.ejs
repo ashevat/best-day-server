@@ -13,7 +13,7 @@
 
 <ul>
     <% results.forEach(function(r) { %>
-        <li><%= r.id %> | <%= r.sentence %> | <img src="<%= r.image_path %>" width="50">  </li>
+        <li><%= r.id %> | <%= r.sentence %>| <%= r.font_color %> | <img src="<%= r.image_path %>" width="50">   </li>
     <% }); %>
 </ul>
 
@@ -24,7 +24,8 @@
 			method='post' 
       encType="multipart/form-data">
       <label>Sentence:</label><input type="text" name="sentence" /><br>
-      <label>image:</label> <input type="file" name="image" />
+      <label>image:</label> <input type="file" name="image" /><br>
+      <label>font color:</label> <input type="text" name="font_color" /><br>
         
 				<input type='submit' value='Upload!' />
 </form>	
