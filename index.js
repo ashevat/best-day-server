@@ -68,12 +68,9 @@ express()
         console.log(err, res);
       }
     );
-   const result1 = await client.query(
-     `INSERT INTO bde_inital(id, sentence, font_color, image_path)VALUES(DEFAULT, '${req.body.sentence}' ,'${req.body.font_color}', '/serve/${image_name}')`,
-      (err, res) => {
-        console.log(err, res);
-      }
-    );
+   let query = "INSERT INTO bde_inital(id, sentence, font_color, image_path)VALUES(DEFAULT, $1 ,$2, $3)"
+   let params = [req.body.sentence, req.body.font_color , "/serve/"+image_name]
+   const result1 = await client.query(query, params);
 
     client.release();
 
@@ -93,27 +90,21 @@ express()
     }
     const client = await pool.connect();
     if(image){
-      const image_name = uuidv4() + image.name ;
+      const image_name = uuidv4() + image.name;
       const result = await client.query(
         `INSERT INTO images(imgname, img )VALUES('${image_name}', '${image.data.toString('hex')}')`,
         (err, res) => {
           console.log(err, res);
         }
       );
-
-      const result1 = await client.query(
-        `UPDATE bde_inital SET ( sentence, font_color, image_path) = ('${req.body.sentence}' ,'${req.body.font_color}', '/serve/${image_name}') WHERE id ='${req.params.id}'`,
-         (err, res) => {
-           console.log(err, res);
-         }
-       );
+      let query = "UPDATE bde_inital SET ( sentence, font_color, image_path) = ($1 ,$2, $3 ) WHERE id =$4";
+      let values = [req.body.sentence,req.body.font_color, "/serve/"+image_name , req.params.id]
+      const result1 = await client.query(query, values);
     }else{
-      const result1 = await client.query(
-        `UPDATE bde_inital SET ( sentence, font_color) = ('${req.body.sentence}' ,'${req.body.font_color}') WHERE id ='${req.params.id}'`,
-         (err, res) => {
-           console.log(err, res);
-         }
-       );
+
+      let query = "UPDATE bde_inital SET ( sentence, font_color) = ($1 ,$2) WHERE id =$3";
+      let values = [req.body.sentence,req.body.font_color, req.params.id]
+      const result1 = await client.query(query, values);
     }
     
    
@@ -160,14 +151,9 @@ express()
       }
     );
 
-    //console.log("running SQL- "+ `INSERT INTO bde(id, sentence, font_color, image_vertical_path, image_horizontal_path, due)VALUES(DEFAULT, '${req.body.sentence}',${req.body.font_color}, '/serve/${vertical_image_name}',  '/serve/${horizontal_image_name}', '${date}')`);
-
-   const result2 = await client.query(
-     `INSERT INTO bde(id, sentence, font_color, image_vertical_path, image_horizontal_path, due)VALUES(DEFAULT, '${req.body.sentence}','${req.body.font_color}', '/serve/${vertical_image_name}',  '/serve/${horizontal_image_name}', '${date}')`,
-      (err, res) => {
-        console.log(err, res);
-      }
-    );
+    let query = "INSERT INTO bde( sentence, font_color, image_vertical_path, image_horizontal_path, due)VALUES($1, $2, $3,  $4, $5)"
+    let values = [req.body.sentence, req.body.font_color, "/serve/"+vertical_image_name, "/serve/"+horizontal_image_name, date ];
+   const result2 = await client.query(query,values );
 
     client.release();
 
