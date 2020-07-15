@@ -2,6 +2,8 @@ const express = require('express')
 const path = require('path')
 const PORT = process.env.PORT || 5000
 const fileUpload = require('express-fileupload');
+const moment = require('moment');
+
 
 
 const { Pool } = require('pg');
@@ -193,6 +195,33 @@ express()
     try {
       const client = await pool.connect()
       const result = await client.query('SELECT * FROM bde');
+      const results = { 'results': (result) ? result.rows : null };
+
+      console.log(results);
+
+      res.render('pages/bde-notifications', results);
+      client.release();
+    } catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+  })
+
+  .get('/bde-notifications-fix', async (req, res) => {
+    try {
+      const client = await pool.connect()
+      const result = await client.query('SELECT * FROM bde');
+      var count = 0;
+      
+      result.rows.forEach(element =>  {
+        console.log(element);
+        var date = moment().add(count, 'days').format('YYYY-MM-DD');
+        count++; 
+        let query = "UPDATE bde SET due = $1 WHERE id=$2"
+        let values = [date, element.id];
+        client.query(query,values );
+
+      });
       const results = { 'results': (result) ? result.rows : null };
 
       console.log(results);
