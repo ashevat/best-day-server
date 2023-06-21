@@ -15,7 +15,7 @@
     "express": "^4.15.2",
     "express-fileupload": "^1.1.6",
     "moment": "^2.27.0",
-    "pg": "^7.17.1"
+    "pg": "^8.4.0"
   },
   "devDependencies": {
     "request": "^2.81.0",
